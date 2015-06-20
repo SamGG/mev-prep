@@ -8,7 +8,11 @@
 read.tdms = function(file, sep = "\t", rd1 = NA, cd1 = NA, nrows = 20, ...) {
   # TODO: guess separator and deduce decimal
   # First read of top lines in order to guess header end
+<<<<<<< HEAD
   hdr = read.table(file, sep = sep, nrows = nrows, header = FALSE, as.is = T, comment.char = "", ...)
+=======
+  hdr = read.table(file, sep = sep, nrows = nrows, header = FALSE, as.is = T, ...)
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
   # Automatic detection: select cells from lower right corner up to an
   # increasing upper left corner and try to convert those columns to numerical
   # values; memorize the highest upper left corner.
@@ -24,7 +28,10 @@ read.tdms = function(file, sep = "\t", rd1 = NA, cd1 = NA, nrows = 20, ...) {
         # cat(i, j, r, "\n")
       }
     }
+<<<<<<< HEAD
     message(sprintf("Automatic detection: (%d, %d)", rd1.auto, cd1.auto))
+=======
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
     if (is.na(rd1.auto))
       stop("Automatic detection of row data start failed!")
     if (is.na(rd1)) rd1 = rd1.auto
@@ -83,7 +90,11 @@ write.tdms = function(tdms, file, ...) {
   s[seq(ncol(tdms$pData)), cd0] = colnames(tdms$pData)
   s[1, seq(ncol(tdms$fData))] = colnames(tdms$fData)
   # Write to disk
+<<<<<<< HEAD
   write.table(s, file, sep = "\t", dec = ".",
+=======
+  write.table(s, file, sep = "\t", dec = ".", 
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
               quote = FALSE, row.names = FALSE, col.names = FALSE, ...)
 }
 
@@ -109,7 +120,11 @@ tdms.transform = function(tdms, func = "none", param = NA) {
     tdms$exprs = log2( tdms$exprs + param )
   } else if (func == "asinh") {
     if (is.na(param)) param = 1  # default to 1
+<<<<<<< HEAD
     if (param < 0) param = 1  # avoid opposite
+=======
+    if (param < 0) param = 1  # avoid opposite  
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
     tdms$exprs[tdms$exprs <= 0] = NA  # avoid NaN, prefill with NA
     tdms$exprs = asinh( tdms$exprs / param )
   } else {
@@ -138,7 +153,11 @@ tdms.center = function(tdms, method="median", percent = 0.05) {
            mean    = apply(tdms$exprs, 1, mean, na.rm = TRUE),
            median  = apply(tdms$exprs, 1, median, na.rm = TRUE),
            trimmed = apply(tdms$exprs, 1, mean, trim = percent, na.rm = TRUE),
+<<<<<<< HEAD
            minmax  = apply(tdms$exprs, 1, function(x)
+=======
+           minmax  = apply(tdms$exprs, 1, function(x) 
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
              sum(quantile(x, probs = c(percent, 1- percent), na.rm = TRUE))/2)
            )
   # Do centering
@@ -152,7 +171,11 @@ tdms.center = function(tdms, method="median", percent = 0.05) {
 tdms.split.matrix.1 = function(m, f, filter = "none", group = "ref", min.size = 1) {
   print("filter")
   print(filter)
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
   # Prepare a list
   lf <- levels(f)
   y <- vector("list", length(lf))
@@ -176,7 +199,42 @@ tdms.split.matrix.1 = function(m, f, filter = "none", group = "ref", min.size = 
   } else if (filter != "none") {
     warning(sprintf("Filter '%s' is unknown.", filter))
     # TODO: return NULL?
+<<<<<<< HEAD
   }
+  # Return, debug lapply(y, head)
+  y
+}
+
+# Split the matrix using the given factor
+# Build a matrix list, one per level
+# A reference level could be included, excluded or the only level of interest
+tdms.split.matrix = function(m, grouping, filter = "none", group = "ref", min.size = 1) {
+  # Split the indices of columns
+  ind <- split(seq(ncol(m)), grouping)
+  lgrouping <- names(ind)
+  # Filter
+  if (filter == "excl" || filter == "only") {
+    # Check group name
+    ind.ref = match(tolower(group), tolower(lgrouping))
+    if (any(is.na(ind.ref)))
+      stop(sprintf("Reference '%s' is unknown.", paste(group[is.na(ind.ref)])))
+    # Set up filter
+    if (filter == "excl") ind = ind[-ind.ref]  # Remove reference
+    if (filter == "only") ind = ind[ ind.ref]  # Keep reference only
+    # None
+  } else if (filter != "none") {
+    warning(sprintf("Filter '%s' is unknown.", filter))
+    # TODO: return NULL?
+=======
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
+  }
+  # TODO: Filter according min.size
+  # Prepare a list
+  y <- vector("list", length(ind))
+  names(y) <- names(ind)
+  # Split the matrix according the indices
+  for (k in names(ind))
+    y[[k]] <- m[ ,ind[[k]], drop = FALSE]
   # Return, debug lapply(y, head)
   y
 }
@@ -228,7 +286,11 @@ tdms.scale = function(tdms, method = "sd", percent = 0.05, group = NA, filter = 
   # Check grouping
   if (tolower(group) == "none" || is.na(group[1])) {
     group = NA
+<<<<<<< HEAD
   } else {
+=======
+  } else {  
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
     # named factor
     if (is.character(group) && group[1] %in% colnames(tdms$pData))
       group = factor(tdms$pData[,group])
@@ -240,7 +302,11 @@ tdms.scale = function(tdms, method = "sd", percent = 0.05, group = NA, filter = 
     warning(sprintf("Method '%s' ignores grouping", method))
     group = NA
   }
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
   # Compute scales, no grouping
   if (length(group) == 1 && is.na(group)) {
     # TODO: set and check trimming parameter: if <=1 then percent else count
@@ -252,19 +318,31 @@ tdms.scale = function(tdms, method = "sd", percent = 0.05, group = NA, filter = 
       probs = c(percent, 1-percent)
     }
     # Compute scaling
+<<<<<<< HEAD
     .scales =
+=======
+    .scales = 
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
       switch(method,
              none   = rep(1, ncol(tdms$exprs)),
              sd     = apply(tdms$exprs, 1, sd, na.rm = TRUE)/2,
              mad    = apply(tdms$exprs, 1, mad, na.rm = TRUE)/2,
+<<<<<<< HEAD
              minmax = apply(tdms$exprs, 1, function(x)
+=======
+             minmax = apply(tdms$exprs, 1, function(x) 
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
                diff(quantile(x, probs = probs, na.rm = TRUE))/2/2.5)
       )
   # Compute scales, grouping
   } else {
     # Split matrix by group
     l = tdms.split.matrix(m = tdms$exprs, grouping = group, filter = filter, min.size = min.size)
+<<<<<<< HEAD
     .scales =
+=======
+    .scales = 
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
       switch(method,
              sd    = lapply(l, apply, 1, sd, na.rm = TRUE),
              mad   = lapply(l, apply, 1, mad, na.rm = TRUE)
@@ -331,12 +409,20 @@ tdms.center.ref = function(tdms, method = "median", grouping = NA, group = NA) {
     warning(sprintf("Method '%s' is unknown, switching to median", method))
     method = "median"
   }
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
   # TODO: group defined, method=none, error
   # Check grouping
   if (tolower(grouping) == "none" || is.na(grouping[1])) {
     grouping = NA
+<<<<<<< HEAD
   } else {
+=======
+  } else {  
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
     # named factor
     if (is.character(grouping) && grouping[1] %in% colnames(tdms$pData))
       grouping = factor(tdms$pData[,grouping])
@@ -345,7 +431,11 @@ tdms.center.ref = function(tdms, method = "median", grouping = NA, group = NA) {
       stop("Grouping is unrecognized")
   }
   print(sprintf("Meth %s Group %s\n", method, group)); print(grouping)
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
   # Compute scales, grouping
   # Split matrix by group
   l = tdms.split.matrix(m = tdms$exprs, grouping = grouping, filter = "only", group = group, min.size = min.size)
@@ -353,7 +443,11 @@ tdms.center.ref = function(tdms, method = "median", grouping = NA, group = NA) {
     warning(sprintf("%s is not found", group))
     return(NULL)
   }
+<<<<<<< HEAD
     .centers =
+=======
+    .centers = 
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
       switch(method,
              median = lapply(l, apply, 1, median, na.rm = TRUE),
              mean   = lapply(l, apply, 1, mean, na.rm = TRUE)
@@ -418,6 +512,7 @@ tdms.t = function(tdms) {
   tdms
 }
 
+<<<<<<< HEAD
 # Remove uninformative rows and columns
 tdms.remove = function(tdms, margins, emptyness = 0.20, unicity = 1) {
   for (margin in margins) {
@@ -468,5 +563,7 @@ tdms.remove = function(tdms, margins, emptyness = 0.20, unicity = 1) {
   }
   tdms
 }
+=======
+>>>>>>> 736a5873798b8ec15e4b0f191a5376f0d1c6ff40
 
 # TODO: add clustering function
