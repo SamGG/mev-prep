@@ -125,7 +125,12 @@ pnorm(-.6745) * 2
 # heatmap_2
 # https://github.com/dgrapov/devium/blob/master/R/Devium%20Cluster%20Analysis.r
 
+# How Do I Draw A Heatmap In R With Both A Color Key And Multiple Color Side Bars?
+# https://www.biostars.org/p/18211/
+# https://gist.github.com/nachocab/3853004
 
+# How to assign your color scale on raw data in heatmap.2()
+# http://stackoverflow.com/questions/20535635/how-to-assign-your-color-scale-on-raw-data-in-heatmap-2
 
 
 
@@ -147,3 +152,13 @@ if (trim > 0 && n) {
 # Colorbar
 # http://stackoverflow.com/questions/9314658/colorbar-from-custom-colorramppalette
 
+
+
+distEisen <- function(x, use = "pairwise.complete.obs") {
+  co.x <- cor(x, use = use)
+  dist.co.x <- 1 - co.x
+  return(as.dist(dist.co.x))
+}
+
+
+# http://ma-bioinformatics.googlecode.com/svn/trunk/R/
