@@ -6,7 +6,7 @@ file = "TDMS_2_3.txt"
 
 
 file = "TDMS_ultra.txt"
-file = "panel_plus_ultra.txt"
+file = "examples/panel_plus_ultra.txt"
 
 # File base
 filen = gsub("\\..{3,4}$", "", file)

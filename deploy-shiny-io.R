@@ -1,0 +1,6 @@
+install.packages('devtools')
+devtools::install_github('rstudio/shinyapps')
+shinyapps::setAccountInfo(name='bioinfoxtra', token='B0F8488D8DC4BB5F590AE173581C8A79', secret='TRiH3QsA1eKR/b7TCXpLF4v/3ukpsl4/MVTOyHP5')
+library(shinyapps)
+source("tdms-examples.R")
+shinyapps::deployApp(appFiles = c("ui.R", "server.R", "global.R", "tdms.R", "tdms-examples.R", sapply(tdms.examples(), function(x) x$file)))

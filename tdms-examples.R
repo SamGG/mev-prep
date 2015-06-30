@@ -11,5 +11,10 @@ tdms.examples = function() {
 "cyto percent" = list(
   desc = "Percentage of some populations analyzed manually",
   file = "ex_panel.txt")
+  )
+,
+"cyto percent plus" = list(
+  desc = "Percentage of some populations analyzed manually plus rescaled extract of MeV example",
+  file = "ex_panel_plus_ultra.txt")
 )
 }
