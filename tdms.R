@@ -256,7 +256,7 @@ tdms.scale = function(tdms, method = "sd", percent = 0.05, group = NA, filter = 
              none   = rep(1, ncol(tdms$exprs)),
              sd     = apply(tdms$exprs, 1, sd, na.rm = TRUE)/2,
              mad    = apply(tdms$exprs, 1, mad, na.rm = TRUE)/2,
-             minmax = apply(tdms$exprs, 1, function(x) 
+             minmax = apply(tdms$exprs, 1, function(x)
                diff(quantile(x, probs = probs, na.rm = TRUE))/2/2.5)
       )
   # Compute scales, grouping
