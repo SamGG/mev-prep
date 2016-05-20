@@ -9,6 +9,12 @@ read.tdms = function(file, sep = "\t", rd1 = NA, cd1 = NA, nrows = 20, ...) {
   # TODO: guess separator and deduce decimal
   # First read of top lines in order to guess header end
   hdr = read.table(file, sep = sep, nrows = nrows, header = FALSE, as.is = T, comment.char = "", ...)
+  # TODO: remove empty columns at the right of the data
+  col.na = sapply(hdr, function(x) all(is.na(x)))
+  if (any(col.na)) {
+    message(sprintf("Empty columns found and removed: (%s)", paste(which(col.na), collapse = ",")))
+  }
+  hdr = hdr[,!col.na]
   # Automatic detection: select cells from lower right corner up to an
   # increasing upper left corner and try to convert those columns to numerical
   # values; memorize the highest upper left corner.
@@ -44,6 +50,7 @@ read.tdms = function(file, sep = "\t", rd1 = NA, cd1 = NA, nrows = 20, ...) {
   colnames(ann.col) = c("Id", hdr[seq(2,rd1-1), cd1-1])
   # Read full file and extract row annotations and data
   dat = read.table(file, sep = sep, skip = rd1-1, header = FALSE, comment.char = "", ...)
+  dat = dat[,!col.na]
   ann.row = as.data.frame(dat[, seq(1, cd1-1)])
   colnames(ann.row) = hdr[1, seq(1, cd1-1)]
   dat = as.matrix(dat[, -seq(1, cd1-1)])
@@ -64,7 +71,7 @@ read.tdms = function(file, sep = "\t", rd1 = NA, cd1 = NA, nrows = 20, ...) {
 }
 
 # Write TDMS file
-write.tdms = function(tdms, file, ...) {
+write.tdms = function(tdms, file, round = 3, ...) {
   # TODO: string for NA
   # Define the shifted area
   rd0 = ncol(tdms$pData)
@@ -74,10 +81,14 @@ write.tdms = function(tdms, file, ...) {
   nc = ncol(tdms$exprs) + cd0
   # Setup a string matrix
   s = matrix('', nrow = nr, ncol = nc)
-  s[seq(nrow(tdms$exprs))+rd0, seq(ncol(tdms$exprs))+cd0] = tdms$exprs
-  # TODO: squeeze digits
+  # Store intensity with rounding
+  if (is.numeric(round)) {
+    s[seq(nrow(tdms$exprs))+rd0, seq(ncol(tdms$exprs))+cd0] = as.matrix(round(tdms$exprs, round))
+  } else {
+    s[seq(nrow(tdms$exprs))+rd0, seq(ncol(tdms$exprs))+cd0] = as.matrix(tdms$exprs)
+  }
   # Add annotations
-  s[seq(ncol(tdms$pData)), seq(nrow(tdms$pData))+cd0] = t(tdms$pData)
+  s[seq(ncol(tdms$pData)), seq(nrow(tdms$pData))+cd0] = t(as.matrix(tdms$pData))
   s[seq(nrow(tdms$fData))+rd0, seq(ncol(tdms$fData))] = as.matrix(tdms$fData)
   # Add names
   s[seq(ncol(tdms$pData)), cd0] = colnames(tdms$pData)
@@ -308,7 +319,7 @@ tdms.sort = function(tdms, group, filter = "none", min.size = 3) {
 # Sort by factor
 tdms.sort.byfactor = function(tdms, group) {
   # named factor
-  if (tolower(group) == "none") return(tdms)
+  if (tolower(group[1]) == "none") return(tdms)
   if (is.character(group) & group[1] %in% colnames(tdms$pData))
     group = factor(tdms$pData[,group])
   # Unrecognized grouping
@@ -343,7 +354,7 @@ tdms.center.ref = function(tdms, method = "median", grouping = NA, group = NA) {
     if (!is.factor(grouping) && length(grouping) != nrow(tdms$pData))
       stop("Grouping is unrecognized")
   }
-  print(sprintf("Meth %s Group %s\n", method, group)); print(grouping)
+  #print(sprintf("Meth %s Group %s\n", method, group)); print(grouping)
 
   # Compute scales, grouping
   # Split matrix by group
@@ -357,7 +368,7 @@ tdms.center.ref = function(tdms, method = "median", grouping = NA, group = NA) {
              median = lapply(l, apply, 1, median, na.rm = TRUE),
              mean   = lapply(l, apply, 1, mean, na.rm = TRUE)
       )
-    print(.centers)
+    #print(.centers)
     if (is.null(.centers))
       stop(sprintf("Method '%s' is unknown in per group mode", method))
     .centers = do.call("cbind", .centers)  # list to matrix
@@ -469,3 +480,9 @@ tdms.remove = function(tdms, margins, emptyness = 0.20, unicity = 1) {
 }
 
 # TODO: add clustering function
+
+
+library(reshape2, quietly = TRUE)
+tdms.melt = function(tdms) {
+ tdms.m = melt(data.frame(tdms$fData, tdms$exprs), variable.name = "exprs", id.vars = colnames(tdms$fData))
+}
